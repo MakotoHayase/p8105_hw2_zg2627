@@ -1,7 +1,0 @@
-"0",""
-"0","# Calculate the proportion of women who are APOE4 carriers"
-"0","baseline_data |>"
-"0","  filter(sex == ""Female"") |>"
-"0","  summarize("
-"0","    proportion_apoe4_carrier = mean(apoe4 == ""Carrier"")"
-"0","  )"

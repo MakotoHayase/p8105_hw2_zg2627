@@ -1,6 +1,0 @@
-"0",""
-"0","# Calculate the average baseline age"
-"0","baseline_data |>"
-"0","  summarize("
-"0","    mean_baseline_age = mean(current_age)"
-"0","  )"

@@ -1,7 +1,0 @@
-"0","# Combine the three Trash Wheel datasets"
-"0","trash_wheel_data ="
-"0","  bind_rows("
-"0","    mr_trash,"
-"0","    professor_trash,"
-"0","    gwynnda_trash"
-"0","  )"
