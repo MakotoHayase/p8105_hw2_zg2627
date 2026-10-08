@@ -1,0 +1,128 @@
+---
+title: "p8105_hw2_zg2627"
+author: "Zimu Guan"
+date: "2026-10-08"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problem 1
+
+```{r, message=FALSE}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(janitor)
+
+# Import the NYC subway entrance/exit data
+subway_data =
+  read_csv("data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") |>
+  clean_names()
+
+names(subway_data)
+```
+```{r}
+# Keep the variables needed for the analysis and recode entry as logical
+subway_clean =
+  subway_data |>
+  select(
+    line,
+    station_name,
+    station_latitude,
+    station_longitude,
+    route1:route11,
+    entrance_type,
+    entry,
+    vending,
+    ada
+  ) |>
+  mutate(
+    entry = entry == "YES"
+  )
+
+dim(subway_clean)
+```
+
+The cleaned subway dataset contains information on subway entrances and exits, including subway line and station name, station coordinates, routes served, entrance type, whether entry is allowed, vending availability, and ADA accessibility. After cleaning, the dataset contains 1868 observations and 19 variables.
+
+```{r}
+# Count distinct subway stations
+subway_clean |>
+  distinct(line, station_name) |>
+  nrow()
+
+# Count distinct ADA-compliant stations
+subway_clean |>
+  filter(ada == TRUE) |>
+  distinct(line, station_name) |>
+  nrow()
+
+# Calculate the proportion of entrances without vending that allow entry
+subway_clean |>
+  filter(vending == "NO") |>
+  summarize(
+    proportion_entry = mean(entry)
+  )
+```
+
+There are 465 distinct stations, of which 84 are ADA compliant. Among entrances and exits without vending, approximately 37.7% allow entry.
+
+```{r}
+# Reshape route variables into a tidy format
+subway_tidy =
+  subway_clean |>
+  mutate(
+    across(route1:route11, as.character)
+  ) |>
+  pivot_longer(
+    route1:route11,
+    names_to = "route_number",
+    values_to = "route_name"
+  ) |>
+  filter(!is.na(route_name))
+```
+
+The cleaned dataset is not fully tidy because route information is stored across multiple columns (route1 through route11). After reshaping these columns into route_number and route_name, each variable is stored in its own column and each route-station combination occupies one row.
+
+```{r}
+# Keep stations served by the A train
+a_train_stations =
+  subway_tidy |>
+  filter(route_name == "A")
+
+# Count distinct stations served by the A train
+a_train_stations |>
+  distinct(line, station_name) |>
+  nrow()
+
+# Count ADA-compliant stations served by the A train
+a_train_stations |>
+  filter(ada == TRUE) |>
+  distinct(line, station_name) |>
+  nrow()
+```
+
+After reshaping the route variables into a tidy format, the A train serves 60 distinct stations, 17 of which are ADA compliant.
+
+
+## Problem 2
+
+```{r}
+
+```
+
+
+
+## Problem 3
+
+```{r}
+
+```
+
+
+
+
+
