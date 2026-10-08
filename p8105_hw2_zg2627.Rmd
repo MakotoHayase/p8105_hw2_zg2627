@@ -121,29 +121,27 @@ mr_trash =
   clean_names() |>
   filter(!is.na(dumpster)) |>
   mutate(
+    year = as.integer(year),
     sports_balls = as.integer(round(sports_balls)),
     trash_wheel = "Mr. Trash Wheel"
   )
-
-dim(mr_trash)
-names(mr_trash)
 ```
+
 ```{r}
 # Import and clean the Professor Trash Wheel data
 professor_trash =
   read_excel(
     "data/202610 Trash Wheel Collection Data.xlsx",
     sheet = "Professor Trash Wheel",
-    range = "A2:M140"
+    range = "A2:M140",
+    na = c("", "dive")
   ) |>
   clean_names() |>
   filter(!is.na(dumpster)) |>
   mutate(
+    year = as.integer(year),
     trash_wheel = "Professor Trash Wheel"
   )
-
-dim(professor_trash)
-names(professor_trash)
 ```
 
 ```{r}
@@ -157,12 +155,46 @@ gwynnda_trash =
   clean_names() |>
   filter(!is.na(dumpster)) |>
   mutate(
+    year = as.integer(year),
     trash_wheel = "Gwynnda"
   )
-
-dim(professor_trash)
-names(professor_trash)
 ```
+
+```{r}
+# Combine the three Trash Wheel datasets
+trash_wheel_data =
+  bind_rows(
+    mr_trash,
+    professor_trash,
+    gwynnda_trash
+  )
+```
+
+```{r}
+# Calculate the total weight collected by Professor Trash Wheel
+professor_total_weight =
+  trash_wheel_data |>
+  filter(trash_wheel == "Professor Trash Wheel") |>
+  summarize(
+    total_weight = sum(weight_tons, na.rm = TRUE)
+  ) |>
+  pull(total_weight)
+
+# Calculate cigarette butts collected by Gwynnda in June 2022
+gwynnda_june_2022 =
+  trash_wheel_data |>
+  filter(
+    trash_wheel == "Gwynnda",
+    year == 2022,
+    month == "June"
+  ) |>
+  summarize(
+    total_cigarette_butts = sum(cigarette_butts, na.rm = TRUE)
+  ) |>
+  pull(total_cigarette_butts)
+```
+
+The combined Trash Wheel dataset contains `r nrow(trash_wheel_data)` observations and `r ncol(trash_wheel_data)` variables from Mr. Trash Wheel, Professor Trash Wheel, and Gwynnda. Key variables include dumpster number, month and year of collection, trash weight and volume, and counts of different types of debris such as plastic bottles, polystyrene, cigarette butts, plastic bags, and wrappers. For the available data, Professor Trash Wheel collected a total of `r professor_total_weight` tons of trash. Gwynnda collected a total of `r format(gwynnda_june_2022, big.mark = ",", scientific = FALSE)` cigarette butts in June 2022.
 
 ## Problem 3
 
